@@ -1,0 +1,53 @@
+Sub MarkAttendanceBySerial_Multi()
+    Dim ws As Worksheet
+    Dim lastRow As Long, lastCol As Long
+    Dim chosenDate As String
+    Dim dateCol As Long, r As Long
+    Dim absInput As String
+    Dim absArr() As String
+    Dim i As Integer, sn As Long
+    
+    ' Use the active sheet (change if needed)
+    Set ws = ActiveSheet
+    lastRow = ws.Cells(ws.Rows.Count, 1).End(xlUp).Row
+    lastCol = ws.Cells(1, ws.Columns.Count).End(xlToLeft).Column
+    
+    ' Ask which date to update
+    chosenDate = InputBox("Enter the date as shown in the header row (e.g., 01-09-2025):", "Select Date")
+    If chosenDate = "" Then Exit Sub
+    
+    ' Find the column for the chosen date
+    dateCol = 0
+    For i = 4 To lastCol
+        If CStr(ws.Cells(1, i).Value) = chosenDate Then
+            dateCol = i
+            Exit For
+        End If
+    Next i
+    If dateCol = 0 Then
+        MsgBox "Date not found in the header row!", vbExclamation
+        Exit Sub
+    End If
+    
+    ' Ask for absent students (comma separated S.No values)
+    absInput = InputBox("Enter absent students' S.No separated by commas (e.g., 2,5,10):", "Absent Students")
+    
+    ' Mark all as Present by default
+    For r = 2 To lastRow
+        ws.Cells(r, dateCol).Value = "P"
+    Next r
+    
+    ' Mark absentees
+    If Trim(absInput) <> "" Then
+        absArr = Split(absInput, ",")
+        For i = LBound(absArr) To UBound(absArr)
+            sn = Val(Trim(absArr(i)))
+            If sn > 0 And sn <= lastRow - 1 Then
+                ws.Cells(sn + 1, dateCol).Value = "A"  ' +1 because row 1 = headers
+            End If
+        Next i
+    End If
+    
+    ' Confirmation message
+    MsgBox "Attendance updated for " & chosenDate & ".", vbInformation
+End Sub
