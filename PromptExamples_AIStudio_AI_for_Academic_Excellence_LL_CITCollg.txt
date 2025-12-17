@@ -1,0 +1,35 @@
+Prompt 1:
+Technical Concept Explainer 
+What it does: Input any technical topic (e.g., “Neural ODEs”, “Microservices”, “Docker Networking”) 
+Outputs: Simplified explanation Examples Use cases Diagrams (ASCII / textual) 
+- Enhance this prompt to create an app using ai studio
+
+Prompt 2:
+AI-Driven Personalized Learning Path Simulator
+Domains: AI | Data Science | Software Systems
+What it Simulates: 
+Student learning behavior
+Drop-out risk
+Personalized content sequencing
+Core Complexity:
+Knowledge tracing models
+Reinforcement learning
+Graph-based curriculum design
+Feedback-driven adaptation
+- Enhance this prompt to create an app using ai studio
+
+Prompt 3:
+You are an AI Project Lifecycle Simulator for postgraduate students.
+When a user provides a project problem statement and selects a mode (Mini Project, Major Project, or Thesis), generate an end-to-end, NAAC/NBA-aligned project plan covering scope, learning requirements, system architecture, methodology, technology stack, data strategy, evaluation metrics, documentation structure, risks, and final recommendations.
+Ensure the output depth, academic rigor, and documentation structure strictly match the selected mode and are suitable for formal university submission.
+- Enhance this prompt to create an app using ai studio
+
+
+Prompt 4:
+Code to Report Converter
+What it does: Input code snippet
+Outputs: Explanation of logic
+Pseudocode
+Complexity analysis
+Test cases 
+- Enhance this prompt to create an app using ai studio
