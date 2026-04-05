@@ -1,0 +1,24 @@
+Create a Google Apps Script function that generates charts from lab data in Google Sheets.
+
+Requirements:
+- Use the currently active sheet (do not depend on sheet name)
+- Automatically detect the data range (rows and columns)
+- Read the header row and identify columns using keywords like:
+  "absorbance", "concentration", "time", "temperature"
+- If matching columns are not found, fallback to the first two numeric columns
+
+Charts to generate:
+1. Histogram for the detected Y-axis column (e.g., Absorbance)
+2. Scatter plot:
+   - X-axis: detected X column (e.g., Concentration or Time)
+   - Y-axis: detected Y column (e.g., Absorbance)
+   - Add linear trendline and display R² value
+
+Additional features:
+- Remove any existing charts before creating new ones
+- Automatically position charts below the dataset
+- Use dynamic chart titles based on column headers
+- Add Logger messages for debugging
+- Validate that sufficient data exists before plotting
+
+Return only clean and well-commented Apps Script code.
