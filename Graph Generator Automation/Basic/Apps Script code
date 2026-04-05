@@ -1,0 +1,34 @@
+function generateLabChart() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName("LabData");
+
+  // If sheet not found, use active sheet instead
+  if (!sheet) {
+    sheet = ss.getActiveSheet();
+    Logger.log("LabData sheet not found. Using active sheet.");
+  }
+
+  const lastRow = sheet.getLastRow();
+
+  // Ensure there is enough data
+  if (lastRow < 2) {
+    throw new Error("Not enough data to create chart.");
+  }
+
+  const range = sheet.getRange(1, 1, lastRow, 2);
+
+  // Remove existing charts
+  sheet.getCharts().forEach(chart => sheet.removeChart(chart));
+
+  // Create chart
+  const chart = sheet.newChart()
+    .setChartType(Charts.ChartType.LINE)
+    .addRange(range)
+    .setPosition(lastRow + 2, 1, 0, 0)
+    .setOption('title', 'Absorbance vs Time')
+    .setOption('hAxis', { title: 'Time (min)' })
+    .setOption('vAxis', { title: 'Absorbance' })
+    .build();
+
+  sheet.insertChart(chart);
+}
