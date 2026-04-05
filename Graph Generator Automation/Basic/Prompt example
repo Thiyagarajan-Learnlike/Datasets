@@ -1,0 +1,22 @@
+Create a Google Apps Script function to generate a chart from lab data in Google Sheets with the following features:
+
+- The script should first try to find a sheet named "LabData"
+- If the sheet does not exist, it should automatically use the currently active sheet
+- The script should dynamically detect the last row of data instead of using a fixed range
+- Assume the first two columns contain the data (X and Y values)
+- The first row contains headers
+- If there is not enough data (less than 2 rows), throw an error
+
+Chart requirements:
+- Create a line chart
+- Set chart title as "Absorbance vs Time"
+- X-axis title: "Time (min)"
+- Y-axis title: "Absorbance"
+- Place the chart below the data automatically
+- Remove any existing charts before creating a new one
+
+Bonus:
+- Add a Logger message if the "LabData" sheet is not found
+- Make the code clean, readable, and beginner-friendly
+
+Return only the Apps Script code.
