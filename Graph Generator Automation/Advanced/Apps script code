@@ -1,0 +1,73 @@
+function generateAdvancedChartsFlexible() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getActiveSheet(); // Always use current sheet
+
+  const lastRow = sheet.getLastRow();
+  const lastCol = sheet.getLastColumn();
+
+  if (lastRow < 2 || lastCol < 2) {
+    throw new Error("Not enough data to generate charts.");
+  }
+
+  const headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+
+  // Remove existing charts
+  sheet.getCharts().forEach(chart => sheet.removeChart(chart));
+
+  // =========================
+  // 🔍 AUTO-DETECT COLUMNS
+  // =========================
+  let absorbanceCol = -1;
+  let concentrationCol = -1;
+
+  headers.forEach((header, index) => {
+    const name = header.toString().toLowerCase();
+
+    if (name.includes("absorbance")) absorbanceCol = index + 1;
+    if (name.includes("concentration")) concentrationCol = index + 1;
+  });
+
+  // Fallback if names not found
+  if (absorbanceCol === -1) absorbanceCol = 2;
+  if (concentrationCol === -1) concentrationCol = 1;
+
+  // =========================
+  // 📊 HISTOGRAM (Auto column)
+  // =========================
+  const histogramRange = sheet.getRange(2, absorbanceCol, lastRow - 1);
+
+  const histogram = sheet.newChart()
+    .setChartType(Charts.ChartType.HISTOGRAM)
+    .addRange(histogramRange)
+    .setPosition(lastRow + 2, 1, 0, 0)
+    .setOption('title', `Distribution of ${headers[absorbanceCol - 1]}`)
+    .setOption('legend', { position: 'none' })
+    .build();
+
+  sheet.insertChart(histogram);
+
+  // =========================
+  // 📈 SCATTER (Auto X vs Y)
+  // =========================
+  const scatterRange = sheet.getRange(1, Math.min(concentrationCol, absorbanceCol), lastRow, 2);
+
+  const scatter = sheet.newChart()
+    .setChartType(Charts.ChartType.SCATTER)
+    .addRange(scatterRange)
+    .setPosition(lastRow + 20, 1, 0, 0)
+    .setOption('title', `${headers[concentrationCol - 1]} vs ${headers[absorbanceCol - 1]}`)
+    .setOption('hAxis', { title: headers[concentrationCol - 1] })
+    .setOption('vAxis', { title: headers[absorbanceCol - 1] })
+    .setOption('trendlines', {
+      0: {
+        type: 'linear',
+        showR2: true,
+        visibleInLegend: true
+      }
+    })
+    .build();
+
+  sheet.insertChart(scatter);
+
+  Logger.log("Charts generated successfully using flexible detection.");
+}
