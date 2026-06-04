@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>LMS Core Ledger Panel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @keyframes pulse-slow {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+    .animate-pulse-slow {
+      animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800 antialiased min-h-screen flex flex-col">
+
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="bg-blue-600 text-white p-2 rounded-lg shadow-md shadow-blue-200">
+          <i class="fa-solid fa-graduation-cap text-lg"></i>
+        </div>
+        <div>
+          <span class="text-lg font-bold tracking-tight text-slate-900">EduStream</span>
+          <span class="text-xs block text-slate-500 font-medium -mt-1">Workspace LMS Engine</span>
+        </div>
+      </div>
+      
+      <div id="syncIndicator" class="inline-flex items-center space-x-2 bg-emerald-50 border border-emerald-200 text-emerald-700 px-3 py-1 rounded-full text-xs font-semibold shadow-sm transition-all duration-300">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse-slow"></span>
+        <span id="syncText">App Syncing Live</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      
+      <section class="lg:col-span-1">
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 sticky top-24">
+          <div class="mb-5">
+            <h2 class="text-xl font-bold text-slate-900 tracking-tight">Create New Course</h2>
+            <p class="text-xs text-slate-500 mt-1">Append an immutable structural data record row immediately to the linked spreadsheet cache database.</p>
+          </div>
+          
+          <form id="createCourseForm" class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1" for="courseName">Course Title</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400"><i class="fa-solid fa-book-bookmark text-sm"></i></span>
+                <input class="w-full bg-slate-50 border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition" id="courseName" type="text" placeholder="e.g., Cloud Data Architecture" required />
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1" for="instructor">Lead Instructor</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400"><i class="fa-solid fa-chalkboard-user text-sm"></i></span>
+                <input class="w-full bg-slate-50 border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition" id="instructor" type="text" placeholder="e.g., Dr. Elizabeth Ross" required />
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1" for="duration">Timeline Timeline/Duration</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400"><i class="fa-regular fa-clock text-sm"></i></span>
+                <input class="w-full bg-slate-50 border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition" id="duration" type="text" placeholder="e.g., 12 Weeks / 45 Hours" required />
+              </div>
+            </div>
+
+            <button type="submit" id="createSubmitBtn" class="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-sm font-semibold py-2.5 px-4 rounded-lg shadow-sm shadow-blue-100 hover:shadow-md transition duration-150 flex items-center justify-center space-x-2">
+              <i class="fa-solid fa-plus text-xs"></i>
+              <span>Deploy Course Record</span>
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <section class="lg:col-span-2 space-y-4">
+        <div class="flex items-center justify-between bg-white px-5 py-4 rounded-xl border border-slate-200 shadow-sm">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900 tracking-tight">Active Sheet Ledger Cache</h2>
+            <p class="text-xs text-slate-500">Live operational data matching rows in standard view tables.</p>
+          </div>
+          <button id="manualRefreshBtn" class="bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 p-2.5 rounded-lg border border-slate-200 text-xs font-medium tracking-wide transition flex items-center space-x-1.5" title="Force Sync Grid Refresh">
+            <i id="refreshIcon" class="fa-solid fa-arrows-rotate"></i>
+            <span class="hidden sm:inline">Refresh Cache</span>
+          </button>
+        </div>
+
+        <div id="catalogCanvas" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          </div>
+      </section>
+
+    </div>
+  </main>
+
+  <div id="editModal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+      <div class="fixed inset-0 bg-slate-900/60 transition-opacity backdrop-blur-sm" aria-hidden="true" onclick="closeEditModal()"></div>
+      <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+      
+      <div class="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-slate-100">
+        <div class="bg-white p-6">
+          <div class="flex justify-between items-center pb-4 border-b border-slate-100 mb-5">
+            <div class="flex items-center space-x-2.5">
+              <div class="bg-amber-100 text-amber-700 p-1.5 rounded-md">
+                <i class="fa-solid fa-pen-to-square text-sm"></i>
+              </div>
+              <h3 class="text-lg font-bold text-slate-900" id="modal-title">Modify Course Properties</h3>
+            </div>
+            <button onclick="closeEditModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-50 transition">
+              <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+          </div>
+
+          <form id="editCourseForm" class="space-y-4">
+            <input type="hidden" id="editCourseId" />
+            
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1" for="editCourseName">Course Title</label>
+              <input class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition" id="editCourseName" type="text" required />
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1" for="editInstructor">Lead Instructor</label>
+              <input class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition" id="editInstructor" type="text" required />
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1" for="editDuration">Timeline Duration</label>
+              <input class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition" id="editDuration" type="text" required />
+            </div>
+
+            <div class="pt-4 flex items-center justify-end space-x-3 border-t border-slate-100 mt-6">
+              <button type="button" onclick="closeEditModal()" class="bg-white hover:bg-slate-50 text-slate-700 text-sm font-semibold py-2 px-4 border border-slate-200 rounded-lg transition">
+                Cancel
+              </button>
+              <button type="submit" id="editSubmitBtn" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2 px-5 rounded-lg shadow-sm transition">
+                Save Adjustments
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Global Runtime Memory Cache Store Array mapping variables state
+    let cachedCourseCatalogStore = [];
+
+    /**
+     * Updates visual state system Sync status network indicators 
+     */
+    function setSystemSyncingState(isWorking, optionalText = "") {
+      const pill = document.getElementById('syncIndicator');
+      const text = document.getElementById('syncText');
+      
+      if (isWorking) {
+        pill.className = "inline-flex items-center space-x-2 bg-amber-50 border border-amber-200 text-amber-700 px-3 py-1 rounded-full text-xs font-semibold shadow-sm";
+        text.innerText = optionalText || "Executing Engine Request...";
+      } else {
+        pill.className = "inline-flex items-center space-x-2 bg-emerald-50 border border-emerald-200 text-emerald-700 px-3 py-1 rounded-full text-xs font-semibold shadow-sm";
+        text.innerText = "App Syncing Live";
+      }
+    }
+
+    /**
+     * Completely maps object matrices arrays into beautiful user-interface cards inside DOM hooks.
+     */
+    function renderCatalogCanvasGrid(courses) {
+      const canvas = document.getElementById('catalogCanvas');
+      canvas.innerHTML = ''; // Purge structural layout memory
+
+      if (!courses || courses.length === 0) {
+        canvas.innerHTML = `
+          <div class="col-span-full bg-white border border-dashed border-slate-300 rounded-xl p-10 text-center flex flex-col items-center justify-center">
+            <div class="bg-slate-100 text-slate-400 p-4 rounded-full mb-3">
+              <i class="fa-solid fa-folder-open text-2xl"></i>
+            </div>
+            <h3 class="text-slate-700 font-bold text-sm">No Active Courses Available</h3>
+            <p class="text-xs text-slate-400 max-w-xs mt-1">Deploy fresh elements using the design entry configuration block panel on the left layout interface screen.</p>
+          </div>
+        `;
+        return;
+      }
+
+      courses.forEach(course => {
+        const cardElement = document.createElement('div');
+        cardElement.className = "bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md transition duration-200 p-5 flex flex-col justify-between group relative overflow-hidden";
+        cardElement.id = `course-card-${course.courseId}`;
+        
+        cardElement.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="bg-slate-100 text-slate-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider border border-slate-200">
+                ID: ${course.courseId}
+              </span>
+              <span class="text-slate-500 text-xs inline-flex items-center space-x-1 font-medium">
+                <i class="fa-regular fa-clock text-slate-400 text-xs"></i>
+                <span>${course.duration}</span>
+              </span>
+            </div>
+            
+            <h3 class="text-base font-bold text-slate-900 tracking-tight leading-snug group-hover:text-blue-600 transition duration-150 mb-1">
+              ${course.courseName}
+            </h3>
+            
+            <p class="text-xs text-slate-500 flex items-center space-x-1.5 mt-2">
+              <span class="text-slate-400 text-[11px]">Instructor:</span>
+              <span class="font-semibold text-slate-700">${course.instructor}</span>
+            </p>
+          </div>
+          
+          <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-end space-x-2">
+            <button onclick="handleEditTrigger(${course.courseId})" class="inline-flex items-center space-x-1 text-slate-600 hover:text-blue-600 bg-slate-50 hover:bg-blue-50 border border-slate-200 hover:border-blue-200 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition" title="Modify Record Attributes">
+              <i class="fa-solid fa-pencil text-[10px]"></i>
+              <span>Edit</span>
+            </button>
+            <button onclick="handleDeleteTrigger(${course.courseId})" class="inline-flex items-center space-x-1 text-slate-600 hover:text-rose-600 bg-slate-50 hover:bg-rose-50 border border-slate-200 hover:border-rose-200 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition" title="Purge Record Row">
+              <i class="fa-solid fa-trash text-[10px]"></i>
+              <span>Delete</span>
+            </button>
+          </div>
+        `;
+        
+        canvas.appendChild(cardElement);
+      });
+    }
+
+    /**
+     * Triggers complete asynchronous extraction data fetch pipelines from backend API architecture pools.
+     */
+    function pipelineTriggerFetchAllCourses() {
+      setSystemSyncingState(true, "Fetching data sheets...");
+      const canvas = document.getElementById('catalogCanvas');
+      const refreshIcon = document.getElementById('refreshIcon');
+      
+      refreshIcon.classList.add('fa-spin');
+      // Inject spinning visualization tracking inside cards target panel wrapper blocks
+      canvas.innerHTML = `
+        <div class="col-span-full py-16 flex flex-col items-center justify-center space-y-3">
+          <i class="fa-solid fa-circle-notch text-3xl text-blue-600 fa-spin"></i>
+          <p class="text-xs font-medium text-slate-500 tracking-wide">Syncing data ledger matrices live...</p>
+        </div>
+      `;
+
+      google.script.run
+        .withSuccessHandler(function(responseArray) {
+          cachedCourseCatalogStore = responseArray;
+          renderCatalogCanvasGrid(responseArray);
+          setSystemSyncingState(false);
+          refreshIcon.classList.remove('fa-spin');
+        })
+        .withFailureHandler(function(error) {
+          alert("Error calling Google Apps Script API engine:\n" + error.message);
+          setSystemSyncingState(false);
+          refreshIcon.classList.remove('fa-spin');
+        })
+        .fetchCoursesFromDatabase();
+    }
+
+    /**
+     * Intercepts creation form actions submission pipelines to route attributes safely towards app endpoints.
+     */
+    document.getElementById('createCourseForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      
+      const submitBtn = document.getElementById('createSubmitBtn');
+      const nameInput = document.getElementById('courseName');
+      const instructorInput = document.getElementById('instructor');
+      const durationInput = document.getElementById('duration');
+
+      // Intercept and Lock UI element states safely
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin text-xs"></i> <span>Processing Row Insertion...</span>`;
+      setSystemSyncingState(true, "Appending course record safely...");
+
+      google.script.run
+        .withSuccessHandler(function(result) {
+          // Reset UI controls
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = `<i class="fa-solid fa-plus text-xs"></i> <span>Deploy Course Record</span>`;
+          document.getElementById('createCourseForm').reset();
+          
+          // Re-fetch ledger elements cleanly
+          pipelineTriggerFetchAllCourses();
+        })
+        .withFailureHandler(function(error) {
+          alert("Operation Failed: " + error.message);
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = `<i class="fa-solid fa-plus text-xs"></i> <span>Deploy Course Record</span>`;
+          setSystemSyncingState(false);
+        })
+        .addCourseToDatabase(nameInput.value, instructorInput.value, durationInput.value);
+    });
+
+    /**
+     * Opens edit modal frame mapping correct variables down to inputs placeholders safely.
+     */
+    function handleEditTrigger(courseId) {
+      const matchItem = cachedCourseCatalogStore.find(c => Number(c.courseId) === Number(courseId));
+      if (!matchItem) return;
+
+      document.getElementById('editCourseId').value = matchItem.courseId;
+      document.getElementById('editCourseName').value = matchItem.courseName;
+      document.getElementById('editInstructor').value = matchItem.instructor;
+      document.getElementById('editDuration').value = matchItem.duration;
+
+      // Reveal dynamic layout modal wrapper overlay
+      document.getElementById('editModal').classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').classList.add('hidden');
+      document.getElementById('editCourseForm').reset();
+    }
+
+    /**
+     * Handles submission processing patterns for modified course metadata blocks.
+     */
+    document.getElementById('editCourseForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const submitBtn = document.getElementById('editSubmitBtn');
+      const cId = document.getElementById('editCourseId').value;
+      const cName = document.getElementById('editCourseName').value;
+      const cInstructor = document.getElementById('editInstructor').value;
+      const cDuration = document.getElementById('editDuration').value;
+
+      submitBtn.disabled = true;
+      submitBtn.innerText = "Saving Parameters...";
+      setSystemSyncingState(true, "Updating sheet row content indices...");
+
+      google.script.run
+        .withSuccessHandler(function(res) {
+          submitBtn.disabled = false;
+          submitBtn.innerText = "Save Adjustments";
+          closeEditModal();
+          pipelineTriggerFetchAllCourses();
+        })
+        .withFailureHandler(function(error) {
+          alert("Adjustment workflow error: " + error.message);
+          submitBtn.disabled = false;
+          submitBtn.innerText = "Save Adjustments";
+          setSystemSyncingState(false);
+        })
+        .updateCourseInDatabase(cId, cName, cInstructor, cDuration);
+    });
+
+    /**
+     * Requests dynamic destruction delete action paths for specific items.
+     */
+    function handleDeleteTrigger(courseId) {
+      if (!confirm("Are you absolutely certain you want to purge course record ID: " + courseId + "? This will delete the matching row from your database.")) {
+        return;
+      }
+
+      const targetCard = document.getElementById(`course-card-${courseId}`);
+      if (targetCard) {
+        targetCard.classList.add('opacity-40', 'pointer-events-none');
+      }
+      
+      setSystemSyncingState(true, "Purging matching database index row...");
+
+      google.script.run
+        .withSuccessHandler(function(res) {
+          pipelineTriggerFetchAllCourses();
+        })
+        .withFailureHandler(function(error) {
+          alert("Deletion process error encountered: " + error.message);
+          if (targetCard) {
+            targetCard.classList.remove('opacity-40', 'pointer-events-none');
+          }
+          setSystemSyncingState(false);
+        })
+        .deleteCourseFromDatabase(courseId);
+    }
+
+    // Attach static DOM interface triggers
+    document.getElementById('manualRefreshBtn').addEventListener('click', pipelineTriggerFetchAllCourses);
+
+    // DOM Lifecycle Entry Initialization Loop Hook Execution
+    document.addEventListener('DOMContentLoaded', function() {
+      pipelineTriggerFetchAllCourses();
+    });
+  </script>
+
+</body>
+</html>
