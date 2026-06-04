@@ -1,0 +1,14 @@
+How to Deploy This App
+1.	Open Google Apps Script. - https://script.google.com/
+2.	Create a new project.
+3.	Paste the contents of Code.gs into the existing Code.gs file.
+4.	From the editor toolbar, run createAndInitializeDemoDatabase.
+5.	Check your execution log and copy the generated spreadsheet ID.
+6.	Replace 'YOUR_SPREADSHEET_ID_HERE' in line 7 of Code.gs with your copied ID.
+7.	Click the + icon next to "Files" in the left panel, choose HTML, and name it Index (do not type the extension; it will automatically become Index.html). Paste the frontend code inside it.
+8.	Click Deploy -> New deployment.
+9.	Select type Web app.
+10.	Change the configuration settings:
+o	Execute as: Me (your email)
+o	Who has access: Anyone (or Anyone with a Google Account depending on authorization scope parameters).
+11.	Click Deploy, authorize the app permissions using your Google account, and copy your live Web app URL.
