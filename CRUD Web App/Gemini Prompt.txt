@@ -1,0 +1,38 @@
+Act as an expert Full-Stack Software Engineer specializing in Google Workspace development, Google Apps Script, and modern frontend design. 
+
+Build a completely functional, lightweight, zero-cost Learning Management System (LMS) web application running entirely on Google Apps Script (as the backend API router) and a single Google Sheet (as the database). The application must fully support CRUD (Create, Read, Update, Delete) operations on a single database table.
+
+Please provide the code split into two files: 'Code.gs' (backend) and 'Index.html' (frontend).
+
+### Architectural Requirements:
+
+1. DATABASE SCHEMA & AUTO-INITIALIZATION ('Code.gs'):
+- The app must connect to a single Google Sheet using a global variable `SPREADSHEET_ID`.
+- Include a setup function named `createAndInitializeDemoDatabase()`. When executed, this function must programmatically create a brand new Google Spreadsheet named "LMS_Demo_Database", create a sheet tab named exactly "Courses", inject the structural column headers in Row 1 ("Course ID", "Course Name", "Instructor", "Duration") with bold styling, append one sample course row, auto-resize columns, and output the new Spreadsheet ID to the Logger console.
+- Include a standard `doGet()` function to serve the frontend web app with a responsive viewport and standard security headers (`XFrameOptionsMode.ALLOWALL`) allowing it to be embedded seamlessly into an iframe wrapper (like Google Sites).
+
+2. SECURED BACKEND API ENDPOINTS ('Code.gs'):
+- `fetchCoursesFromDatabase()`: A READ API that reads all data rows from the "Courses" sheet, maps columns to a clean JavaScript object array, and returns it. If only headers exist, it returns an empty array.
+- `addCourseToDatabase(courseName, instructor, duration)`: A CREATE API that appends a new row to the sheet. It must utilize `LockService.getScriptLock()` with a 10-second timeout buffer to securely prevent concurrency collisions during simultaneous user writes. It must auto-calculate a strict, sequential auto-incrementing numeric ID based on the last row's ID value.
+- `updateCourseInDatabase(courseId, courseName, instructor, duration)`: An UPDATE API that uses a write lock to locate the row matching the specific `courseId` in Column A and overwrites its respective attributes with the modified values.
+- `deleteCourseFromDatabase(courseId)`: A DELETE API that uses a write lock to find the exact row matching the `courseId` in Column A and purges/deletes that specific row from the spreadsheet entirely.
+
+3. FRONTEND SINGLE-PAGE APPLICATION UI ('Index.html'):
+- Design a beautiful, professional, and modern UI matching a Google Classroom meets Tailwind UI aesthetic. Use Tailwind CSS via CDN and FontAwesome icons via CDN.
+- Structure the page layout using a 1/3 to 2/3 horizontal grid system:
+  * Left Column (1/3): A structured interactive web form card ("Create New Course") with clean styled input fields for Course Name, Instructor Name, and Timeline/Duration, and a styled submit button.
+  * Right Column (2/3): A dynamic canvas section ("Active Sheet Ledger Cache") displaying a live catalog grid of courses alongside a manual refresh cache button.
+- Make the interface completely responsive (stacking vertically on mobile viewports). 
+- Include an active system syncing indicator pill in the top header navbar (`App Syncing Live`) with a subtle pulse animation effect.
+- Include a beautiful hidden Modal Overlay panel in the HTML that unhides dynamically when an "Edit" button is clicked. This modal must contain an update form prepopulated with that specific course's current details.
+
+4. CLIENT-SIDE CONTROLLER ACTIONS & CRUD INTERACTIONS ('Index.html'):
+- When the DOM finishes loading, it must automatically trigger an asynchronous call to fetch data from the spreadsheet.
+- While fetching rows, display a dynamic visual loader (e.g., a rotating FontAwesome circle-notch spinner) inside the target catalog canvas grid.
+- Map rows cleanly into elegant, modern data-cards showing the ID badge, duration tracking icon, bold course title, and instructor details. 
+- Every course card must feature two action utility buttons: an "Edit" button (represented by a pencil icon) and a "Delete" button (represented by a trash icon).
+- Clicking "Delete" must trigger a native confirmation prompt (`confirm()`). If accepted, it disables the card, fires the backend delete workflow, and refreshes the canvas view.
+- Clicking "Edit" must capture the card's specific database parameters, populate the modal input fields, and open the overlay. Submitting the modal form must send the payload to the update API, close the modal smoothly, and update the catalog canvas.
+- Intercept all form submissions natively (`preventDefault()`), block submit buttons during active data transfers, display loading state indicators, and refresh the live ledger cache layout arrays seamlessly without refreshing or blinking the browser screen.
+
+Please provide robust, production-ready, clean code without arbitrary shortcuts, placeholders, or omissions.
